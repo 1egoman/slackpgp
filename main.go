@@ -2,35 +2,61 @@ package main
 
 import (
   "fmt"
-  "os"
   "golang.org/x/net/context"
+
+  "net/http"
+  "github.com/gorilla/mux"
 
   slackbot "github.com/BeepBoopHQ/go-slackbot"
   "github.com/nlopes/slack"
 )
 
 func main() {
-	bot := slackbot.New(os.Getenv("SLACK_TOKEN"))
+	// bot := slackbot.New(os.Getenv("SLACK_TOKEN"))
+  //
+  // // Send an encrypted message to somebody
+	// bot.Hear("").MessageHandler(SendMessageHandler)
+  //
+  // // Give the bot your info so people can send encrypted messages to you.
+	// bot.Messages(slackbot.DirectMessage).Subrouter().Hear("init").MessageHandler(OnboardingHandler)
+	// bot.Run()
 
-	// toMe := bot.Messages(slackbot.DirectMessage, slackbot.DirectMention).Subrouter()
-	// toMe.Hear("(?i)(hi|hello).*").MessageHandler(HelloHandler)
-	bot.Hear("init").MessageHandler(Onboarding)
-	bot.Hear("").MessageHandler(HelloHandler)
-	bot.Run()
+  router := mux.NewRouter().StrictSlash(false)
+
+  // Setting up a new user's public key
+  router.HandleFunc("/onboard/{secret}", OnboardTemplateHandler).Methods("GET")
+  router.HandleFunc("/onboard/{secret}", OnboardHandler).Methods("POST")
+
+	http.ListenAndServe(":8000", router)
 }
 
-func HelloHandler(ctx context.Context, bot *slackbot.Bot, evt *slack.MessageEvent) {
+
+func SendMessageHandler(ctx context.Context, bot *slackbot.Bot, evt *slack.MessageEvent) {
   fmt.Println("");
   fmt.Println("Text", evt.Text)
+  fmt.Println("Message", evt)
 
-  u := User{SlackUser: "rgausnet", KeybaseUser: "rgausnet", PublicKey: publicKey}
-  fmt.Println(u.Encrypt("Foo!"))
+  sender := User{SlackUser: "rgausnet", KeybaseUser: "rgausnet", PublicKey: publicKey}
+  recipient := User{SlackUser: "rgausnet", KeybaseUser: "rgausnet", PublicKey: publicKey}
 
-	bot.Reply(evt, "Oh hello!", slackbot.WithTyping)
+  // Encrypt a message to the recipient.
+  encryptedMessage := recipient.Encrypt("Foo!")
+
+  // Format the message to be sent via slack
+  msg := fmt.Sprintf(
+    "Hey <@%s>, here's a message from <@%s>: \n ```%s```",
+    recipient.SlackUser,
+    sender.SlackUser,
+    encryptedMessage,
+  )
+
+  // Send the message
+	bot.Reply(evt, msg, slackbot.WithTyping)
 }
 
-func Onboarding(ctx context.Context, bot *slackbot.Bot, evt *slack.MessageEvent) {
-	bot.Reply(evt, "LEt's get set up.", slackbot.WithTyping)
+// When you DM the bot, it gives you a command
+func OnboardingHandler(ctx context.Context, bot *slackbot.Bot, evt *slack.MessageEvent) {
+  bot.Reply(evt, "Let's get set up. Click this link: http://localhost:8000/onboard/kyxmf34itxg4tay2", slackbot.WithTyping)
 }
 
 
