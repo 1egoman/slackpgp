@@ -1,11 +1,13 @@
 package users
 
 import (
-  // "fmt"
+  "fmt"
+  "strings"
   // "os"
   // "database/sql"
   // _ "github.com/mattn/go-sqlite3"
   "crypto/rand"
+  "encoding/base64"
 )
 
 // How long should configuration secrets be in length?
@@ -21,62 +23,17 @@ type User struct {
   Secret string
 }
 
-var users []User
+var users []*User
 
 func init() {
-  users = append(users, User{
-    Username: "rgausnet",
-    PublicKey: "pubkey",
-    Secret: "abcdef",
-    IsConfigurable: true,
-  })
+  user := NewUser("rgausnet")
+  fmt.Println("Created User: ", user)
+
+  // Create a test user
+  users = append(users, user)
 }
 
-// var db *sql.DB
-// func initDatabase() {
-//   var err error
-//
-//   // Where should the database be located?
-//   DATABASE_NAME := "./foo.db"
-//   if a := os.Getenv("DATABASE_NAME"); a != "" {
-//     DATABASE_NAME = a
-//   }
-//
-//   // Open the database. `db` is a global used by all user methods.
-//   db, _ = sql.Open("sqlite3", DATABASE_NAME)
-//   // defer db.Close()
-//
-//   // Create the users table if it doesn't exist.
-// 	sqlStmt := `
-// 	CREATE TABLE IF NOT EXISTS users (
-//     id integer not null primary key,
-//     username text
-//     pubkey text
-//     isconfig bool
-//     secret text
-//   );
-// 	DELETE FROM users;
-// 	`
-//   _, err = db.Exec(sqlStmt)
-// 	if err != nil {
-//     panic(err)
-// 	}
-//
-//   fmt.Printf("* Created database in %s\n", DATABASE_NAME)
-// }
-
-// Given a sql row, unpack it into a struct
-// func usersRowToStruct(row *sql.Row) (*User, error) {
-//   var user User
-//   err := row.Scan(&user.Username, &user.PublicKey, &user.IsConfigurable, &user.ConfigurationSecret)
-//   if err != nil {
-//     return nil, err
-//   } else {
-//     return &user, nil
-//   }
-// }
-
-// Set a user to be configurable.
+// Set a user to be configurable by setting the boolean and generating a new secret.
 func (u *User) EnableConfiguration() error {
   configSecret := make([]byte, CONFIGURATION_SECRET_LENGTH)
   _, err := rand.Read(configSecret)
@@ -85,27 +42,40 @@ func (u *User) EnableConfiguration() error {
     return err;
   } else {
     u.IsConfigurable = true
-    u.Secret = string(configSecret);
+
+    // Encode secret to base64. Replace plus and slash with url safe characters.
+    u.Secret = base64.StdEncoding.EncodeToString(configSecret)
+    u.Secret = strings.Replace(u.Secret, "/", "_", -1)
+    u.Secret = strings.Replace(u.Secret, "+", "-", -1)
     return nil;
+  }
+}
+
+// When updates are made to a user struct, this will sync any changes back to disk.
+func (u *User) Save() {
+  for ct, user := range users {
+    if u.Username == user.Username {
+      fmt.Println("Saving...", u)
+      users[ct] = u
+      return
+    }
   }
 }
 
 
 
 func NewUser(username string) *User {
-  return &User{Username: username}
+  user := User{Username: username, IsConfigurable: true}
+  user.EnableConfiguration()
+  return &user
 }
 
-func NewUserWithKey(username string, publicKey string) *User {
-  return &User{Username: username, PublicKey: publicKey}
-}
 
-
-
+// Given a secret, see if a configurable user can be found with that secret.
 func GetUserBySecret(secret string) (*User, error) {
   for _, user := range users {
-    if user.Secret == secret {
-      return &user, nil
+    if user.Secret == secret && user.IsConfigurable {
+      return user, nil
     }
   }
   return nil, nil
