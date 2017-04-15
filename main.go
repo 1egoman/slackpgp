@@ -3,6 +3,8 @@ package main
 import (
   "fmt"
   "io"
+  "os"
+  "bytes"
 
   "net/http"
   "github.com/gorilla/mux"
@@ -45,12 +47,24 @@ func EncryptionHandler(w http.ResponseWriter, r *http.Request) {
 
   // Format the message to be sent via slack
   msg := fmt.Sprintf(
-    "Hey <@%s>, here's a message: \n ```%s```",
+    "{\"text\": \"Hey <@%s>, here's a message: \n ```%s```\"}",
     recipient.Username,
     encryptedMessage,
   )
 
-  // Respond.
-  w.WriteHeader(201)
-  io.WriteString(w, msg)
+  // Send the message
+  _, err = http.Post(
+    os.Getenv("SLACK_INCOMING_WEBHOOK_URL"),
+    "application/json",
+    bytes.NewBuffer([]byte(msg)),
+  )
+
+  if err {
+    w.WriteHeader(500)
+    io.WriteString(w, err.Error())
+  }
+    // Respond.
+    w.WriteHeader(201)
+    io.WriteString(w, "Send message.")
+  }
 }
