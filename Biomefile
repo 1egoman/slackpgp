@@ -1,0 +1,5 @@
+# This is a Biomefile. It helps you create an environment to run this app.
+# More info at https://github.com/1egoman/biome
+name=keybase-slack
+SLACK_TOKEN=
+GOPATH=`pwd`
