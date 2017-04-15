@@ -1,7 +1,7 @@
 package main
 
 import (
-  "fmt"
+  // "fmt"
   "io"
   "strings"
 
@@ -18,7 +18,6 @@ import (
 func OnboardTemplateHandler(w http.ResponseWriter, r *http.Request) {
   vars := mux.Vars(r)
   user, err := users.GetUserBySecret(vars["secret"])
-  fmt.Println("Found User", user)
 
   if err != nil {
     // On error, print out the error as a response

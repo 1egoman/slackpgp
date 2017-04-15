@@ -3,14 +3,16 @@ package users
 import (
   "fmt"
   "strings"
-  // "os"
-  // "database/sql"
-  // _ "github.com/mattn/go-sqlite3"
+
   "crypto/rand"
   "encoding/base64"
+
+  "bytes"
+  "golang.org/x/crypto/openpgp"
+  "golang.org/x/crypto/openpgp/armor"
 )
 
-// How long should configuration secrets be in length?
+// How long should configuration secrets be in random characters before base64 encode?
 const CONFIGURATION_SECRET_LENGTH = 32
 
 type User struct {
@@ -27,7 +29,7 @@ var users []*User
 
 func init() {
   user := NewUser("rgausnet")
-  fmt.Println("Created User: ", user)
+  fmt.Printf("Link: http://localhost:8000/onboard/%s\n", user.Secret)
 
   // Create a test user
   users = append(users, user)
@@ -63,13 +65,44 @@ func (u *User) Save() {
 }
 
 
+// Given a public key and a message, encrypt the data with that pubkic key and return it.
+// 
+//   (input) => Encrypt => Armor => (output)
+//
+func (u *User) Encrypt(message string) string {
+	encbuf := bytes.NewBuffer(nil)
+
+  // Once the data has been encrypted, stream to the armorer
+  w, err := armor.Encode(encbuf, "PGP MESSAGE", map[string]string{
+    "Sent-By": "slackbot",
+    "To-Slack-User": u.Username,
+  })
+	if err != nil {
+		panic(err)
+	}
+
+  // Encrypt data from plaintext
+  entityList, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(u.PublicKey))
+	plaintext, err := openpgp.Encrypt(w, entityList, nil, nil, nil)
+	if err != nil {
+		panic(err)
+	}
+	_, err = plaintext.Write([]byte(message))
+
+	plaintext.Close()
+	w.Close()
+
+  return string(encbuf.Bytes())
+}
+
+
+
 
 func NewUser(username string) *User {
   user := User{Username: username, IsConfigurable: true}
   user.EnableConfiguration()
   return &user
 }
-
 
 // Given a secret, see if a configurable user can be found with that secret.
 func GetUserBySecret(secret string) (*User, error) {
@@ -78,5 +111,19 @@ func GetUserBySecret(secret string) (*User, error) {
       return user, nil
     }
   }
+
+  // No user found! :/
+  return nil, nil
+}
+
+// Given a secret, see if a configurable user can be found with that secret.
+func GetUserByUsername(username string) (*User, error) {
+  for _, user := range users {
+    if user.Username == username {
+      return user, nil
+    }
+  }
+
+  // No user found! :/
   return nil, nil
 }
