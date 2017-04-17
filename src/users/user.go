@@ -27,14 +27,6 @@ type User struct {
 
 var users []*User
 
-func init() {
-  user := NewUser("rgausnet")
-  fmt.Printf("Link: http://localhost:8000/onboard/%s\n", user.Secret)
-
-  // Create a test user
-  users = append(users, user)
-}
-
 // Set a user to be configurable by setting the boolean and generating a new secret.
 func (u *User) EnableConfiguration() error {
   configSecret := make([]byte, CONFIGURATION_SECRET_LENGTH)
@@ -62,6 +54,9 @@ func (u *User) Save() {
       return
     }
   }
+
+  // If the user isn't in the list, then add the user.
+  users = append(users, u)
 }
 
 

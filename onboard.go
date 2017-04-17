@@ -1,8 +1,8 @@
 package main
 
 import (
-  // "fmt"
   "io"
+
   "strings"
 
   "net/http"
@@ -10,7 +10,6 @@ import (
 
   "users"
 )
-
 
 
 // This is called on GET /onboard/{secret}. It renders the form for the user to set their public
