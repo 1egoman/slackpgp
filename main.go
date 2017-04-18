@@ -3,6 +3,7 @@ package main
 import (
   "fmt"
   "io"
+  "os"
   "encoding/json"
 
   "bytes"
@@ -24,6 +25,7 @@ func main() {
   // Setting up a new user's public key
   router.HandleFunc("/onboard/{secret}", OnboardTemplateHandler).Methods("GET")
   router.HandleFunc("/onboard/{secret}", OnboardHandler).Methods("POST")
+  router.HandleFunc("/onboard_success", UserEnteredPubKeyHandler).Methods("GET")
 
   // The main entrypoint - the slack webhook.
   router.HandleFunc("/webhook", WebhookHandler).Methods("POST")
@@ -39,14 +41,20 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
   slashCommandPayload := strings.Split(slashCommandText, " ")
 
   switch r.Form["text"][0] {
-
     // Setup a new user.
     case "init":
       u := users.NewUser(senderUsername)
       u.EnableConfiguration()
       u.Save()
 
-      io.WriteString(w, "Click here to set your pgp key: http://localhost:8000/onboard/"+u.Secret)
+      // Where is the server hosted?
+      hostname := os.Getenv("HOSTNAME")
+      if hostname == "" {
+        hostname = "http://localhost:8000"
+      }
+
+      // Give the user a path to set their public key.
+      io.WriteString(w, "Click here to configure your public key: "+hostname+"/onboard/"+u.Secret)
 
 
     // Send an encrypted message to another user.
@@ -233,4 +241,9 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
       </script>
     </body>
   </html>`)
+}
+
+func UserEnteredPubKeyHandler(w http.ResponseWriter, r *http.Request) {
+  io.WriteString(w, `Cool, thanks for adding your public key!
+Now, try to send someone else a message: /pgp @another-user my secret message!`)
 }

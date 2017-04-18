@@ -57,7 +57,7 @@ func OnboardHandler(w http.ResponseWriter, r *http.Request) {
     user.Save()
 
     // Redirect back to the root.
-    http.Redirect(w, r, "/", 302)
+    http.Redirect(w, r, "/onboard_success", 302)
   } else if err == nil && user == nil {
     // No user exists with that secret key
     w.WriteHeader(404)
