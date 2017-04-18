@@ -68,7 +68,7 @@ func (u *User) Encrypt(message string) string {
 	encbuf := bytes.NewBuffer(nil)
 
   // Once the data has been encrypted, stream to the armorer
-  w, err := armor.Encode(encbuf, "PGP MESSAGE", map[string]string{
+  armorer, err := armor.Encode(encbuf, "PGP MESSAGE", map[string]string{
     "Sent-By": "slackbot",
     "To-Slack-User": u.Username,
   })
@@ -78,14 +78,14 @@ func (u *User) Encrypt(message string) string {
 
   // Encrypt data from plaintext
   entityList, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(u.PublicKey))
-	plaintext, err := openpgp.Encrypt(w, entityList, nil, nil, nil)
+	encrypter, err := openpgp.Encrypt(armorer, entityList, nil, nil, nil)
 	if err != nil {
 		panic(err)
 	}
-	_, err = plaintext.Write([]byte(message))
+	_, err = encrypter.Write([]byte(message))
 
-	plaintext.Close()
-	w.Close()
+	encrypter.Close()
+	armorer.Close()
 
   return string(encbuf.Bytes())
 }
