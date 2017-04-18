@@ -4,14 +4,15 @@ A slackbot to pgp encrypt and armor text sent via a slack slash command.
 
 ## Usage
 
-First, to be able to accept pgp messages, initialize the service wiht your public key:
+
+First, register your public key with the service by running `/pgp init`:
 
 ```
 > /pgp init
-Click here to set your pgp key: http://localhost:8000/onboard/nan5a090N-q8nIKs23ZIxfTAkWfb5pthbQyyZMOjQbs=
+Click here to configure your public key: http://localhost:8000/onboard/nan5a090N-q8nIKs23ZIxfTAkWfb5pthbQyyZMOjQbs=
 ```
 
-That link lets you set your public key.
+That link lets you configure your public key.
 
 Then, send an encrypted message: `/pgp @user Hey! This message is secret!`
 
