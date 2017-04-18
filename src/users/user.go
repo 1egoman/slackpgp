@@ -94,9 +94,9 @@ func (u *User) Encrypt(message string) string {
 
 
 func NewUser(username string) *User {
-  user := NewUser(username)
+  user := User{Username: username}
   user.EnableConfiguration()
-  return user
+  return &user
 }
 
 // Given a secret, see if a configurable user can be found with that secret.
