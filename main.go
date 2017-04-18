@@ -56,7 +56,6 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
       // Give the user a path to set their public key.
       io.WriteString(w, "Click here to configure your public key: "+hostname+"/onboard/"+u.Secret)
 
-
     // Send an encrypted message to another user.
     default:
       // Remove '@' from start of username string
