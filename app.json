@@ -5,7 +5,7 @@
   "keywords": ["pgp", "slack", "slackbot", "encryption", "gpg", "public key", "private key"],
   "env": {
     "HOSTNAME": {
-      "description": "Enter the url to the dyno, ie, mycoolappname.herokuapp.com",
+      "description": "Enter the url to the dyno, ie, mypgpslackbot.herokuapp.com",
       "required": true
     }
   }
