@@ -2,5 +2,11 @@
   "name": "PGP Slackbot",
   "description": "A slackbot to send encrypted PGP messages.",
   "repository": "https://github.com/1egoman/slackpgp",
-  "keywords": ["pgp", "slack", "slackbot", "encryption", "gpg", "public key", "private key"]
+  "keywords": ["pgp", "slack", "slackbot", "encryption", "gpg", "public key", "private key"],
+  "env": {
+    "HOSTNAME": {
+      "description": "Enter the url to the dyno, ie, mycoolappname.herokuapp.com",
+      "required": true
+    }
+  }
 }
