@@ -30,8 +30,12 @@ func main() {
   // The main entrypoint - the slack webhook.
   router.HandleFunc("/webhook", WebhookHandler).Methods("POST")
 
-  fmt.Println("Listening on :8000")
-	http.ListenAndServe(":8000", router)
+  port := os.Getenv("PORT")
+  if port == "" {
+    port = "8000"
+  }
+  fmt.Println("Listening on :"+port)
+	http.ListenAndServe(":"+port, router)
 }
 
 func WebhookHandler(w http.ResponseWriter, r *http.Request) {
