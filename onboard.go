@@ -8,7 +8,7 @@ import (
   "net/http"
   "github.com/gorilla/mux"
 
-  "users"
+  "github.com/1egoman/slackpgp/users"
 )
 
 

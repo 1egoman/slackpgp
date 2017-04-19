@@ -13,7 +13,7 @@ import (
   "github.com/gorilla/mux"
 
   // Contains our user model and database logic
-  "users"
+  "github.com/1egoman/slackpgp/users"
 )
 
 func main() {
@@ -30,6 +30,7 @@ func main() {
   // The main entrypoint - the slack webhook.
   router.HandleFunc("/webhook", WebhookHandler).Methods("POST")
 
+  fmt.Println("Listening on :8000")
 	http.ListenAndServe(":8000", router)
 }
 
