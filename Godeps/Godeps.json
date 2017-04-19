@@ -1,0 +1,40 @@
+{
+	"ImportPath": "github.com/1egoman/slackpgp",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.3.0-5-g599cba5",
+			"Rev": "599cba5e7b6137d46ddf58fb1765f5d928e69604"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/cast5",
+			"Rev": "12c985af8526c1f6f0c463bbfd9d69623d13b323"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/openpgp",
+			"Rev": "12c985af8526c1f6f0c463bbfd9d69623d13b323"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/openpgp/armor",
+			"Rev": "12c985af8526c1f6f0c463bbfd9d69623d13b323"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/openpgp/elgamal",
+			"Rev": "12c985af8526c1f6f0c463bbfd9d69623d13b323"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/openpgp/errors",
+			"Rev": "12c985af8526c1f6f0c463bbfd9d69623d13b323"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/openpgp/packet",
+			"Rev": "12c985af8526c1f6f0c463bbfd9d69623d13b323"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/openpgp/s2k",
+			"Rev": "12c985af8526c1f6f0c463bbfd9d69623d13b323"
+		}
+	]
+}
