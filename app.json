@@ -10,13 +10,8 @@
     },
     "DB_DRIVER": {
       "description": "Database drive to use, defaults to postgres.",
-      "default": "postgres",
-      "required": false
-    },
-    "DB_PATH": {
-      "description": "Database url",
-      "default": "database",
-      "required": false
+      "value": "postgres",
+      "required": true
     }
   },
   "addons": [
