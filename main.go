@@ -100,7 +100,12 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 
 		recipient, err := users.GetUserByUsername(recipientUsername)
 		if recipient == nil {
-			io.WriteString(w, "The user "+slashCommandPayload[0]+" doesn't exist or hasn't registered. Tell them to run `/pgp init`.")
+			// Get the command that the user typed
+			command := "/pgp"
+			if len(r.Form["command"]) > 0 {
+				command = strings.Split(r.Form["command"][0], " ")[0]
+			}
+			io.WriteString(w, "The user "+slashCommandPayload[0]+" doesn't exist or hasn't registered. Tell them to run `"+command+" init`.")
 			return
 		} else if err != nil {
 			io.WriteString(w, err.Error())
