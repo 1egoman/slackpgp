@@ -8,7 +8,7 @@
       "description": "Enter the url to the dyno, ie, mypgpslackbot.herokuapp.com",
       "required": true
     },
-    "DB_DRIVER": {
+    "DATABASE_DRIVER": {
       "description": "Database drive to use, defaults to postgres.",
       "value": "postgres",
       "required": true
