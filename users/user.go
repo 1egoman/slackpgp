@@ -25,13 +25,13 @@ var db *gorm.DB
 func init() {
   var err error
 
-  driver := os.Getenv("DB_DRIVER")
+  driver := os.Getenv("DATABASE_DRIVER")
   if driver == "" {
-    panic("DB_DRIVER is empty!")
+    panic("DATABASE_DRIVER is empty!")
   }
-  path := os.Getenv("DB_PATH")
+  path := os.Getenv("DATABASE_URL")
   if path == "" {
-    panic("DB_PATH is empty!")
+    panic("DATABASE_URL is empty!")
   }
   db, err = gorm.Open(driver, path)
 

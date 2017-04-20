@@ -1,10 +1,9 @@
 # This is a Biomefile. It helps you create an environment to run this app.
 # More info at https://github.com/1egoman/biome
 name=keybase-slack
-SLACK_TOKEN=
 GOPATH=`pwd`
 
-DB_DRIVER=sqlite3
-DB_PATH=./database.db
+DATABASE_DRIVER=sqlite3
+DATABASE_URL=./database.db
 SLACK_INCOMING_WEBHOOK_URL=https://hooks.slack.com/services/XXXXX/XXXXXXX...
 SLACK_VERIFICATION_TOKEN=
