@@ -41,16 +41,45 @@ func main() {
 func WebhookHandler(w http.ResponseWriter, r *http.Request) {
   r.ParseForm()
 
+  if len(r.Form["text"]) == 0 {
+    io.WriteString(w, "No text arg!")
+    return
+  }
+  if len(r.Form["user_name"]) == 0 {
+    io.WriteString(w, "No user_name arg!")
+    return
+  }
+
+  // If a slack token was specified, validate against that.
+  if slack_token := os.Getenv("SLACK_VERIFICATION_TOKEN"); slack_token != "" && slack_token != r.Form["token"][0] {
+    io.WriteString(w, "Invalid slack token. Please make sure the SLACK_VERIFICATION_TOKEN environment variable is set correctly.")
+  }
+
   senderUsername := r.Form["user_name"][0]
   slashCommandText := r.Form["text"][0]
   slashCommandPayload := strings.Split(slashCommandText, " ")
 
-  switch r.Form["text"][0] {
-    // Setup a new user.
-    case "init":
+  // Did the user type anything after the slash command?
+  // ie, if the user just typed /pgp, then give them an error.
+  if len(strings.Trim(strings.Join(slashCommandPayload, ""), " ")) == 0 {
+    // Get the command that the user typed
+    command := "/pgp"
+    if len(r.Form["command"]) > 0 {
+      command = r.Form["command"][0]
+    }
+
+    // Send them an error
+    w.WriteHeader(404)
+    io.WriteString(w, "Please specify a command (ie, `"+command+" init`) or send a message (ie, `"+command+" @user my secret message`)")
+    return
+  }
+
+   switch r.Form["text"][0] {
+     // Setup a new user.
+     case "init":
       u := users.NewUser(senderUsername)
       u.EnableConfiguration()
-      u.Save()
+      u.Create()
 
       // Where is the server hosted?
       hostname := os.Getenv("HOSTNAME")

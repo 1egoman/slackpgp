@@ -1,6 +1,7 @@
 package users
 
 import (
+  "os"
   "fmt"
   "strings"
 
@@ -10,12 +11,41 @@ import (
   "bytes"
   "golang.org/x/crypto/openpgp"
   "golang.org/x/crypto/openpgp/armor"
+
+  "github.com/jinzhu/gorm"
+  _ "github.com/jinzhu/gorm/dialects/sqlite"
+  _ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // How long should configuration secrets be in random characters before base64 encode?
 const CONFIGURATION_SECRET_LENGTH = 32
 
+var db *gorm.DB
+
+func init() {
+  var err error
+
+  driver := os.Getenv("DB_DRIVER")
+  if driver == "" {
+    panic("DB_DRIVER is empty!")
+  }
+  path := os.Getenv("DB_PATH")
+  if path == "" {
+    panic("DB_PATH is empty!")
+  }
+  db, err = gorm.Open(driver, path)
+
+  if err != nil {
+    panic(err)
+  }
+
+  // Migrate user model
+  db.AutoMigrate(&User{})
+}
+
 type User struct {
+  gorm.Model
+
   Username string
   PublicKey string
 
@@ -24,8 +54,6 @@ type User struct {
   IsConfigurable bool
   Secret string
 }
-
-var users []*User
 
 // Set a user to be configurable by setting the boolean and generating a new secret.
 func (u *User) EnableConfiguration() error {
@@ -47,16 +75,13 @@ func (u *User) EnableConfiguration() error {
 
 // When updates are made to a user struct, this will sync any changes back to disk.
 func (u *User) Save() {
-  for ct, user := range users {
-    if u.Username == user.Username {
-      fmt.Println("Saving...", u)
-      users[ct] = u
-      return
-    }
-  }
+  fmt.Println("Save user", u)
+  db.Save(u)
+}
 
-  // If the user isn't in the list, then add the user.
-  users = append(users, u)
+func (u *User) Create() {
+  fmt.Println("Creating user", u)
+  db.Create(u)
 }
 
 
@@ -101,24 +126,22 @@ func NewUser(username string) *User {
 
 // Given a secret, see if a configurable user can be found with that secret.
 func GetUserBySecret(secret string) (*User, error) {
-  for _, user := range users {
-    if user.Secret == secret && user.IsConfigurable {
-      return user, nil
-    }
+  user := &User{}
+  err := db.Where("secret = ?", secret).First(user)
+  if err.Error != nil {
+    return nil, nil
+  } else {
+    return user, nil
   }
-
-  // No user found! :/
-  return nil, nil
 }
 
 // Given a secret, see if a configurable user can be found with that secret.
 func GetUserByUsername(username string) (*User, error) {
-  for _, user := range users {
-    if user.Username == username {
-      return user, nil
-    }
+  user := &User{}
+  err := db.Where("username = ?", username).First(user)
+  if err.Error != nil {
+    return nil, nil
+  } else {
+    return user, nil
   }
-
-  // No user found! :/
-  return nil, nil
 }

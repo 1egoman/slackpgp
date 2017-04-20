@@ -4,4 +4,7 @@ name=keybase-slack
 SLACK_TOKEN=
 GOPATH=`pwd`
 
+DB_DRIVER=sqlite3
+DB_PATH=./database.db
 SLACK_INCOMING_WEBHOOK_URL=https://hooks.slack.com/services/XXXXX/XXXXXXX...
+SLACK_VERIFICATION_TOKEN=
