@@ -7,6 +7,25 @@
     "HOSTNAME": {
       "description": "Enter the url to the dyno, ie, mypgpslackbot.herokuapp.com",
       "required": true
+    },
+    "DB_DRIVER": {
+      "description": "Database drive to use, defaults to postgres.",
+      "default": "postgres",
+      "required": false
+    },
+    "DB_PATH": {
+      "description": "Database url",
+      "default": "database",
+      "required": false
     }
-  }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql",
+      "as": "database",
+      "options": {
+        "version": "9.5"
+      }
+    }
+  ]
 }
