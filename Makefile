@@ -1,5 +1,5 @@
 build:
-	go build -ldflags -s
+	time go build -x -ldflags -s
 
 run: build
 	./slackpgp
