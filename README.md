@@ -1,11 +1,15 @@
-# Keybase Slackbot
+# Slack PGP
 
 A slackbot to pgp encrypt and armor text sent via a slack slash command.
 
+## Installation
+
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-## Usage
+After installation, the app hosts a http server. There is a setup guide available at `/` that will
+walk you through setting up the service correctly.
 
+## Usage
 
 First, register your public key with the service by running `/pgp init`:
 
@@ -14,13 +18,14 @@ First, register your public key with the service by running `/pgp init`:
 Click here to configure your public key: http://localhost:8000/onboard/nan5a090N-q8nIKs23ZIxfTAkWfb5pthbQyyZMOjQbs=
 ```
 
-That link lets you configure your public key.
+Click on that link ad paste in your public key. We'll encrypt messages sent to you with this key.
 
-Then, send an encrypted message: `/pgp @user Hey! This message is secret!`
+Then, send an encrypted message: `/pgp @foo Hey! This message is secret!`
 
 The bot will then encrypt that message with your public key and post it in slack for you:
 
 ```
+Hey @foo, here's a message from @bar:
 -----BEGIN PGP MESSAGE-----
 To-Slack-User: user
 Sent-By: slackbot
@@ -36,3 +41,8 @@ zxHY4V+V4DLgluFqRuAf4hxuWEXgaeQYpT1uQH8QS41Xb2EHYFXS4BTkUDkHa2H7
 =33OY
 -----END PGP MESSAGE-----
 ```
+
+
+### Security
+There is one database table that only contains a user and their respective public key. No other
+personal information is collected or stored.
