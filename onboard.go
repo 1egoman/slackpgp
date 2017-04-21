@@ -69,6 +69,12 @@ func OnboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Redirect here on success.
+func UserEnteredPubKeyHandler(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, `Cool, thanks for adding your public key!
+Now, try to send someone else a message: /pgp @another-user my secret message!`)
+}
+
 const ONBOARD_TEMPLATE = `
 <doctype html />
 <html>

@@ -2,7 +2,6 @@ package users
 
 import (
   "os"
-  "fmt"
   "strings"
 
   "crypto/rand"
@@ -21,27 +20,6 @@ import (
 const CONFIGURATION_SECRET_LENGTH = 32
 
 var db *gorm.DB
-
-func init() {
-  var err error
-
-  driver := os.Getenv("DATABASE_DRIVER")
-  if driver == "" {
-    panic("DATABASE_DRIVER is empty!")
-  }
-  path := os.Getenv("DATABASE_URL")
-  if path == "" {
-    panic("DATABASE_URL is empty!")
-  }
-  db, err = gorm.Open(driver, path)
-
-  if err != nil {
-    panic(err)
-  }
-
-  // Migrate user model
-  db.AutoMigrate(&User{})
-}
 
 type User struct {
   gorm.Model
@@ -75,12 +53,10 @@ func (u *User) EnableConfiguration() error {
 
 // When updates are made to a user struct, this will sync any changes back to disk.
 func (u *User) Save() {
-  fmt.Println("Save user", u)
   db.Save(u)
 }
 
 func (u *User) Create() {
-  fmt.Println("Creating user", u)
   db.Create(u)
 }
 
@@ -90,10 +66,10 @@ func (u *User) Create() {
 //   (input) => Encrypt => Armor => (output)
 //
 func (u *User) Encrypt(message string) string {
-	encbuf := bytes.NewBuffer(nil)
+	encBuf := bytes.NewBuffer(nil)
 
   // Once the data has been encrypted, stream to the armorer
-  armorer, err := armor.Encode(encbuf, "PGP MESSAGE", map[string]string{
+  armorer, err := armor.Encode(encBuf, "PGP MESSAGE", map[string]string{
     "Sent-By": "slackbot",
     "To-Slack-User": u.Username,
   })
@@ -112,12 +88,35 @@ func (u *User) Encrypt(message string) string {
 	encrypter.Close()
 	armorer.Close()
 
-  return string(encbuf.Bytes())
+  return string(encBuf.Bytes())
 }
 
 
 
+func init() {
+  var err error
 
+  driver := os.Getenv("DATABASE_DRIVER")
+  if driver == "" {
+    panic("DATABASE_DRIVER is empty!")
+  }
+  path := os.Getenv("DATABASE_URL")
+  if path == "" {
+    panic("DATABASE_URL is empty!")
+  }
+  db, err = gorm.Open(driver, path)
+
+  if err != nil {
+    panic(err)
+  }
+
+  // Migrate user model
+  db.AutoMigrate(&User{})
+}
+
+
+// Given a username as a string, return a pointer to a new user.
+// THe user has public key configuration open.
 func NewUser(username string) *User {
   user := User{Username: username}
   user.EnableConfiguration()
