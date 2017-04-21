@@ -6,8 +6,8 @@ A slackbot to pgp encrypt and armor text sent via a slack slash command.
 
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-After installation, the app hosts a http server. There is a setup guide available at `/` that will
-walk you through setting up the service correctly.
+After deployment, click on `View`. You'll be brought to a setup guide that'll walk you through
+setting up slack to work with this slackbot.
 
 ## Usage
 
