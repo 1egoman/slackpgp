@@ -2,6 +2,8 @@
 
 A slackbot to pgp encrypt and armor text sent via a slack slash command.
 
+![Intro](intro.gif)
+
 ## Installation
 
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
